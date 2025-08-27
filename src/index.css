@@ -1,12 +1,15 @@
 @import "@fontsource-variable/inter";
 @import "tailwindcss";
 
-
+/* =========================
+   THEME TOKENS (LIGHT)
+   ========================= */
 :root {
   /* Brand gradient (purple/indigo) */
   --brand-from: 234 89% 66%;
   --brand-to:   268 89% 66%;
-  
+  --accent: 245 100% 65%;   /* electric indigo / brand pop */
+  --chip:   220 14% 96%;    /* subtle chip bg */
 
   /* Semantic colors (light mode) */
   --bg:        0 0% 90%;
@@ -16,8 +19,70 @@
   --muted:     240 4% 35%;
   --up:        142 70% 45%; /* green */
   --down:      0 72% 50%;   /* red */
+
+  --ring: 245 100% 65%;
 }
 
+/* Focus ring for keyboard nav */
+*:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px hsl(var(--ring) / .35);
+}
+
+/* =========================
+   MICRO-ANIMATIONS
+   ========================= */
+
+/* fade + rise in */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fadeUp { animation: fadeUp .35s ease-out both; }
+
+/* quick scale “pop” (good for buttons/stars) */
+@keyframes popIn {
+  0% { transform: scale(.96); opacity: .85; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.animate-pop { animation: popIn .18s ease-out both; }
+
+/* shimmer loader for skeleton rows/blocks */
+/* skeleton shimmer */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.5rem;
+  background: linear-gradient(
+    90deg,
+    hsl(var(--surface)) 0%,
+    hsl(var(--surface) / .6) 50%,
+    hsl(var(--surface)) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.2s linear infinite;
+}
+.shimmer {
+  background: linear-gradient(90deg,
+    hsl(var(--surface)) 0%,
+    hsl(var(--surface) / .6) 20%,
+    hsl(var(--surface)) 40%);
+  background-size: 200% 100%;
+  animation: shimmer 1.2s linear infinite;
+  border-radius: .375rem;
+}
+
+/* tap feedback utility (press effect) */
+.pressable { transition: transform .12s ease; }
+.pressable:active { transform: scale(.96); }
+
+/* =========================
+   THEME TOKENS (DARK)
+   ========================= */
 .dark {
   /* Semantic colors (dark mode) */
   --bg:        240 10% 6%;
@@ -27,9 +92,12 @@
   --muted:     240 3% 72%;
   --up:        142 60% 45%;
   --down:      0 70% 56%;
+  --chip:      240 5% 15%;
 }
 
-/* Base typography & smoothing */
+/* =========================
+   BASE TYPOGRAPHY
+   ========================= */
 html, body, #root { height: 100%; }
 body {
   font-family: "Inter Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
@@ -39,11 +107,11 @@ body {
   -moz-osx-font-smoothing: grayscale;
   background-color: hsl(var(--bg));
   color: hsl(var(--text));
- 
 }
 
-
-
+/* =========================
+   UTILITIES / COMPONENT SKIN
+   ========================= */
 
 /* Reusable brand gradient background */
 .brand-gradient {
@@ -63,12 +131,8 @@ body {
   padding: 1rem;
   box-shadow: 0 6px 16px hsl(240 10% 5% / .14);
   color: hsl(var(--text));
-
 }
-.glass *{
-  color: inherit;
-}
-
+.glass * { color: inherit; }
 
 /* Muted text color */
 .text-muted { color: hsl(var(--muted)); }
@@ -86,18 +150,19 @@ body {
 
 /* KPI card accent border on active */
 .kpi-active {
-  box-shadow: 0 0 0 2px hsl(var(--brand-from) / .2), 0 6px 20px hsl(var(--brand-from) / .25);
+  box-shadow: 0 0 0 2px hsl(var(--brand-from) / .2),
+              0 6px 20px hsl(var(--brand-from) / .25);
 }
+
 /* Reusable input style – works in both light/dark */
 .input {
-  width: 100%;                              
+  width: 100%;
   border-radius: 0.5rem;
   border: 1px solid hsl(var(--border));
-  background-color: hsl(var(--surface));      
-  color: hsl(var(--text));                    
-  padding: 0.5rem 0.75rem;                    
+  background-color: hsl(var(--surface));
+  color: hsl(var(--text));
+  padding: 0.5rem 0.75rem;
 }
-/* Placeholder matches muted text instead of being too light/hidden */
 .input::placeholder {
   color: hsl(var(--muted));
   opacity: 1;

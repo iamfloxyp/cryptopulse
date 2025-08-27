@@ -1,23 +1,22 @@
 // src/pages/Auth.jsx
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom"; // ✅ add useLocation
 import Button from "../components/Button";
 import { useAuth } from "../store/useAuth";
 
-/**
- * Frontend-only demo auth:
- * - Login: phone-only
- * - Sign Up: phone -> OTP (generated locally) -> verify -> login
- */
 export default function Auth() {
-  const { login } = useAuth();           // from your store/useAuth.js
+  const { login } = useAuth();
   const nav = useNavigate();
+  const location = useLocation(); // ✅ capture where user came from
 
-  const [mode, setMode] = useState("login");          // "login" | "signup"
+  // read redirect target, default to "/"
+  const from = location.state?.from?.pathname || "/";
+
+  const [mode, setMode] = useState("login");
   const [phone, setPhone] = useState("");
-  const [step, setStep] = useState("form");           // for signup: "form" | "verify"
-  const [code, setCode] = useState("");               // user-entered OTP
-  const [sentCode, setSentCode] = useState("");       // generated OTP
+  const [step, setStep] = useState("form");
+  const [code, setCode] = useState("");
+  const [sentCode, setSentCode] = useState("");
   const [error, setError] = useState("");
 
   const resetAll = () => {
@@ -33,43 +32,37 @@ export default function Auth() {
     resetAll();
   };
 
-  // --- LOGIN: simple demo
+  // --- LOGIN
   const handleLogin = (e) => {
     e.preventDefault();
     if (!phone.trim()) return setError("Enter your phone number");
     login({ phone: phone.trim() });
-    nav("/"); // go to dashboard
+    nav(from, { replace: true }); // ✅ go back to original page
   };
 
-  // --- SIGNUP: step 1: send code (demo generate)
+  // --- SIGNUP STEP 1
   const handleSendCode = (e) => {
     e.preventDefault();
     if (!phone.trim()) return setError("Enter your phone number");
 
-    // generate a 6-digit demo code
     const demo = String(Math.floor(100000 + Math.random() * 900000));
     setSentCode(demo);
     setStep("verify");
     setError("");
-
-    // NOTE: Demo only – show the code so you can test easily
-    // Remove this <alert> in production when you wire a real SMS/Email service.
     alert(`Demo verification code: ${demo}`);
   };
 
-  // --- SIGNUP: step 2: verify
+  // --- SIGNUP STEP 2
   const handleVerify = (e) => {
     e.preventDefault();
     if (code.trim() !== sentCode) return setError("Invalid code. Try again.");
-    // verified – create session locally
     login({ phone: phone.trim(), createdAt: Date.now() });
-    nav("/");
+    nav(from, { replace: true }); // ✅ go back to original page
   };
 
   return (
     <main className="min-h-screen flex items-center justify-center px-4">
       <div className="w-full max-w-md glass p-6 rounded-lg shadow-md">
-        {/* Title */}
         <h1 className="text-xl font-semibold text-center mb-4">
           {mode === "login"
             ? "Login"
@@ -78,7 +71,6 @@ export default function Auth() {
             : "Verify your phone"}
         </h1>
 
-        {/* Error */}
         {error && (
           <div className="mb-3 text-sm bg-red-500/10 border border-red-500/30 text-red-400 rounded px-3 py-2">
             {error}
@@ -101,7 +93,7 @@ export default function Auth() {
           </form>
         )}
 
-        {/* --- SIGNUP STEP 1: PHONE --- */}
+        {/* --- SIGNUP STEP 1 --- */}
         {mode === "signup" && step === "form" && (
           <form onSubmit={handleSendCode} className="space-y-4">
             <input
@@ -117,7 +109,7 @@ export default function Auth() {
           </form>
         )}
 
-        {/* --- SIGNUP STEP 2: VERIFY CODE --- */}
+        {/* --- SIGNUP STEP 2 --- */}
         {mode === "signup" && step === "verify" && (
           <form onSubmit={handleVerify} className="space-y-4">
             <div className="text-sm text-muted">
@@ -146,7 +138,7 @@ export default function Auth() {
           </form>
         )}
 
-        {/* Switch link (always at the bottom) */}
+        {/* Switch link */}
         <p className="mt-6 text-center text-sm text-muted">
           {mode === "login" ? (
             <>

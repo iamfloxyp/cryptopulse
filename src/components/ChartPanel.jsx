@@ -1,58 +1,19 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Line } from 'react-chartjs-2';
 import {
-  Chart as ChartJS,
-  LineElement,
-  PointElement,
-  LinearScale,
-  TimeScale,
-  CategoryScale,
-  Tooltip,
-  Filler,
-  Legend,
+  Chart as ChartJS, LineElement, PointElement, LinearScale, TimeScale, CategoryScale,
+  Tooltip, Filler, Legend,
 } from 'chart.js';
 import 'chartjs-adapter-date-fns';
 
-// Register Chart.js modules
-ChartJS.register(
-  LineElement,
-  PointElement,
-  LinearScale,
-  TimeScale,
-  CategoryScale,
-  Tooltip,
-  Filler,
-  Legend
-);
+ChartJS.register(LineElement, PointElement, LinearScale, TimeScale, CategoryScale, Tooltip, Filler, Legend);
 
-// CSS-var helpers
-const getCssVar = (name) =>
-  getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+const getCssVar = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 
-const hslVar = (name, alpha) => {
-  const v = getCssVar(name); // e.g. "0 0% 98%"
-  return alpha ? `hsl(${v} / ${alpha})` : `hsl(${v})`;
-};
-
-function formatCompact(n) {
-  try {
-    return new Intl.NumberFormat(undefined, { notation: 'compact' }).format(n);
-  } catch {
-    return n?.toLocaleString?.() ?? String(n);
-  }
-}
-
-export default function ChartPanel({ coinId, days, currency, loader, theme }) {
+export default function ChartPanel({ coinId, days, currency, loader }) {
   const [series, setSeries] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // theme-aware colors (recompute when theme flips)
-  const COLOR_TEXT    = useMemo(() => hslVar('--text'),            [theme]);
-  const COLOR_TEXT15  = useMemo(() => hslVar('--text', '.15'),     [theme]);
-  const COLOR_MUTED   = useMemo(() => hslVar('--muted'),           [theme]);
-  const COLOR_SURFACE = useMemo(() => hslVar('--surface'),         [theme]);
-
-  // fetch chart data
   useEffect(() => {
     let alive = true;
     (async () => {
@@ -61,93 +22,71 @@ export default function ChartPanel({ coinId, days, currency, loader, theme }) {
         const data = await loader({ id: coinId, vsCurrency: currency, days });
         if (!alive) return;
         setSeries(data?.prices ?? []);
-      } catch {
-        setSeries([]);
-      } finally {
-        alive && setLoading(false);
-      }
+      } catch { setSeries([]); }
+      finally { if (alive) setLoading(false); }
     })();
     return () => { alive = false; };
   }, [coinId, days, currency, loader]);
 
-  // dataset
-  const chartData = useMemo(() => {
-    const labels = series.map((p) => new Date(p[0]));
-    const values = series.map((p) => p[1]);
+  // choose color by performance (last vs first)
+  const lineColor = useMemo(() => {
+    if (!series.length) return `hsl(${getCssVar('--text')})`;
+    const first = series[0][1], last = series[series.length-1][1];
+    return last >= first ? `hsl(${getCssVar('--up')})` : `hsl(${getCssVar('--down')})`;
+  }, [series]);
 
+  const chartData = useMemo(() => {
+    const labels = series.map(p => new Date(p[0]));
+    const values = series.map(p => p[1]);
     return {
       labels,
-      datasets: [
-        {
-          label: `${coinId} (${currency.toUpperCase()})`,
-          data: values,
-          fill: true,
-          borderWidth: 2,
-          borderColor: theme === 'dark' ? 'white' : 'black',
-backgroundColor: theme === 'dark'
-  ? 'rgba(255,255,255,0.15)'
-  : 'rgba(0,0,0,0.15)',
-          pointRadius: 0,
-          tension: 0.25,
-        },
-      ],
+      datasets: [{
+        label: `${coinId} (${currency.toUpperCase()})`,
+        data: values,
+        fill: true,
+        borderWidth: 2,
+        borderColor: lineColor,
+        backgroundColor: lineColor.replace(')', ' / .18)'),
+        pointRadius: 0,
+        tension: 0.25,
+      }],
     };
-  }, [series, coinId, currency, COLOR_TEXT, COLOR_TEXT15]);
+  }, [series, coinId, currency, lineColor]);
 
-  // options
+  const tickColor = `hsl(${getCssVar('--text')} / .8)`;
+
   const options = {
     responsive: true,
     maintainAspectRatio: false,
     interaction: { mode: 'index', intersect: false },
     plugins: {
       legend: { display: false },
-     tooltip: {
-  backgroundColor: theme === 'dark' ? '#1e293b' : '#f9fafb', // slate vs white
-  titleColor: theme === 'dark' ? 'white' : 'black',
-  bodyColor: theme === 'dark' ? 'white' : 'black',
-  callbacks: {
-    label: ctx => `${currency.toUpperCase()} ${formatCompact(ctx.parsed.y)}`
-  }
-}
+      tooltip: {
+        callbacks: {
+          label: (ctx) => `${currency.toUpperCase()} ${new Intl.NumberFormat(undefined,{notation:'compact'}).format(ctx.parsed.y)}`
+        }
+      }
     },
     scales: {
       x: {
         type: 'time',
         time: { unit: days === 1 ? 'hour' : 'day' },
         grid: { display: false },
-        ticks: { maxTicksLimit: 6, color: theme === 'dark' ? '#ffffff' : 'black' , font: {weight: '600'}},
+        ticks: { maxTicksLimit: 6, color: tickColor }
       },
       y: {
-        grid: { color: 'hsl(var(--border))' },
-        ticks: { color: COLOR_MUTED,   font: {weight: '600'} },
-      },
-    },
+        grid: { color: 'hsla(0 0% 50% / .12)' },
+        ticks: { color: tickColor }
+      }
+    }
   };
 
-  if (loading) {
-    return (
-      <div className="h-64 grid place-items-center text-sm font-medium text-[hsl(var(--text))]/80">
-        Loading chart…
-      </div>
-    );
-  }
-
-  if (!series.length) {
-    return (
-      <div className="h-64 grid place-items-center text-sm font-medium text-[hsl(var(--text))]">
-        (no chart data)
-      </div>
-    );
-  }
+  if (loading) return <div className="h-64 grid place-items-center text-sm font-medium text-[hsl(var(--text))]/80">Loading chart…</div>;
+  if (!series.length) return <div className="h-64 grid place-items-center text-sm font-medium text-[hsl(var(--text))]">(no chart data)</div>;
 
   return (
-    <div className="h-64">
-      <Line
-        key={`${coinId}-${days}-${currency}-${theme}`} 
-        data={chartData}
-        options={options}
-        redraw
-      />
+    <div className="h-64 animate-fadeUp">
+      <Line key={`${coinId}-${days}-${currency}`} data={chartData} options={options} redraw />
     </div>
   );
 }
