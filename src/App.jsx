@@ -1,20 +1,23 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { Routes, Route } from 'react-router-dom';
+import Navbar from './components/Navbar';
+import Dashboard from './pages/Dashboard';
+import Auth from './pages/Auth';
+import Alerts from './pages/Alerts';
+import Settings from './pages/Settings';
+import NotFound from './pages/NotFound';
 
-function App() {
-  const [count, setCount] = useState(0)
 
+export default function App() {
   return (
-    <>
-     <div className="min-h-screen grid place-items-center bg-zinc-50 dark:bg-zinc-950">
-    <h1 className="text-3xl font-bold text-blue-600 dark:text-blue-300">
-      Tailwind is live 🎉
-    </h1>
-  </div>
-    </>
-  )
+    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100">
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/auth" element={<Auth />} />
+        <Route path="/alerts" element={<Alerts />} />
+        <Route path="/settings" element={<Settings />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </div>
+  );
 }
-
-export default App
