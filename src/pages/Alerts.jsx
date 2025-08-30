@@ -15,12 +15,12 @@ export default function Alerts() {
 
   // settings / prefs
   const [currency] = useLocal('currency', 'usd');
-  const [density]  = useLocal('density', 'comfortable'); // 'comfortable' | 'compact'
+  const [density]  = useLocal('density', 'comfortable'); 
   const cellPad    = density === 'compact' ? 'py-1 px-2' : 'py-2 px-3';
 
   // form state
   const [coinId, setCoinId] = useState('bitcoin');
-  const [direction, setDirection] = useState('above'); // 'above' | 'below'
+  const [direction, setDirection] = useState('above');
   const [price, setPrice] = useState('');
 
   // alerts store
@@ -29,7 +29,7 @@ export default function Alerts() {
   // -----------------------------
   // Top 100 + search
   // -----------------------------
-  const [markets, setMarkets] = useState([]); // [{id, name, symbol}]
+  const [markets, setMarkets] = useState([]); 
   const [query, setQuery] = useState('');
 
   useEffect(() => {
@@ -79,9 +79,6 @@ export default function Alerts() {
     // clear AFTER adding
     setPrice('');
     setQuery('');
-    // Optionally reset others:
-    // setDirection('above');
-    // setCoinId('bitcoin');
   }
 
   // -----------------------------
@@ -118,7 +115,7 @@ export default function Alerts() {
   }, [rules, currency, markTriggered]);
 
   // -----------------------------
-  // Gate: require auth (now with Login button + redirect back)
+  // Gate: require auth (with Login button + redirect back)
   // -----------------------------
   if (!isAuthed) {
     return (
@@ -150,7 +147,7 @@ export default function Alerts() {
         <SectionHeader title="Create alert">When price crosses your target.</SectionHeader>
 
         <form onSubmit={onCreate} className="grid md:grid-cols-4 gap-2 items-center">
-          {/* Search + collapsed dropdown */}
+          {/* Search + dropdown */}
           <div className="md:col-span-2 space-y-2">
             <input
               className="input h-10 text-sm"
@@ -208,8 +205,7 @@ export default function Alerts() {
 
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            {/* Light = surface/text; Dark = dark row */}
-            <thead className="bg-[hsl(var(--surface))] text-[hsl(var(--text))] dark:bg-zinc-100 dark:text-white">
+            <thead className="bg-[hsl(var(--surface))] text-[hsl(var(--text))] dark:bg-zinc-900 dark:text-white">
               <tr className="[&>th]:text-left [&>th]:px-3 [&>th]:py-2 [&>th]:font-semibold">
                 <th>Coin</th><th>Condition</th><th>Status</th><th>Triggered</th><th></th>
               </tr>

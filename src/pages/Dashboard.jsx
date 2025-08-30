@@ -1,4 +1,4 @@
-// src/pages/Dashboard.jsx
+import React from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import { useLocal } from '../store/useLocal';
 import Button from '../components/Button';
@@ -148,171 +148,216 @@ export default function Dashboard() {
 
       {/* Chart + Watchlist */}
       <section className="grid lg:grid-cols-3 gap-6">
-        <Card className="lg:col-span-2 p-5">
-          <SectionHeader
-            title="Price chart"
-            aside={
-              <div className="flex items-center gap-2">
-                {[1, 7, 30].map((d) => (
-                  <Button
-                    key={d}
-                    size="sm"
-                    variant="pill"
-                    data-active={days === d}
-                    onClick={() => setDays(d)}
-                    className="min-w-[3.25rem] pressable"
-                  >
-                    {d === 1 ? '24h' : `${d}d`}
-                  </Button>
-                ))}
-              </div>
-            }
-          >
-            {coinId.toUpperCase()} Price Chart ({currency.toUpperCase()})
-          </SectionHeader>
+        {/* CHART (wrap in min-w-0 to prevent overflow) */}
+        <div className="lg:col-span-2 min-w-0">
+          <Card className="p-5 min-w-0 overflow-hidden">
+            <SectionHeader
+              title="Price chart"
+              aside={
+                <div className="flex items-center gap-2">
+                  {[1, 7, 30].map((d) => (
+                    <Button
+                      key={d}
+                      size="sm"
+                      variant="pill"
+                      data-active={days === d}
+                      onClick={() => setDays(d)}
+                      className="min-w-[3.25rem] pressable"
+                    >
+                      {d === 1 ? '24h' : `${d}d`}
+                    </Button>
+                  ))}
+                </div>
+              }
+            >
+              {coinId.toUpperCase()} Price Chart ({currency.toUpperCase()})
+            </SectionHeader>
 
-          <div className="animate-fadeUp" style={{ animationDelay: '90ms' }}>
-            <ChartPanel
-              coinId={coinId}
-              days={days}
-              currency={currency}
-              loader={getChart}
-              theme={theme}
-              chartGrid={chartGrid}
-              chartSmooth={chartSmooth}
+            <div className="animate-fadeUp min-w-0" style={{ animationDelay: '90ms' }}>
+              <ChartPanel
+                coinId={coinId}
+                days={days}
+                currency={currency}
+                loader={getChart}
+                theme={theme}
+                chartGrid={chartGrid}
+                chartSmooth={chartSmooth}
+              />
+            </div>
+          </Card>
+        </div>
+
+        {/* WATCHLIST (also min-w-0) */}
+        <div className="min-w-0">
+          <Card className="p-5">
+            <SectionHeader title="Search & Watchlist">Save coins you care about.</SectionHeader>
+            <input
+              className="input mb-3"
+              placeholder="Search coin…"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
             />
-          </div>
-        </Card>
-
-        <Card className="p-5">
-          <SectionHeader title="Search & Watchlist">Save coins you care about.</SectionHeader>
-          <input
-            className="input mb-3"
-            placeholder="Search coin…"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-          <div className="hr my-3" />
-          <ul className="space-y-2 text-sm">
-            {watchlist.length === 0 ? (
-              <li className="text-[hsl(var(--text))]/80">No items yet.</li>
-            ) : (
-              watchlist.map((id) => (
-                <li key={id} className="flex items-center justify-between gap-3 border border-[hsl(var(--border))] rounded-md px-3 py-2">
-                  <button
-                    onClick={() => setCoinId(id)}
-                    className="hover:underline uppercase"
-                    title="Show on chart"
+            <div className="hr my-3" />
+            <ul className="space-y-2 text-sm">
+              {watchlist.length === 0 ? (
+                <li className="text-[hsl(var(--text))]/80">No items yet.</li>
+              ) : (
+                watchlist.map((id) => (
+                  <li
+                    key={id}
+                    className="flex items-center justify-between gap-3 border border-[hsl(var(--border))] rounded-md px-3 py-2"
                   >
-                    {id}
-                  </button>
-                  <button
-                    onClick={() => toggleWatch(id)}
-                    className="text-red-500 hover:underline"
-                    title="Remove"
-                  >
-                    Remove
-                  </button>
-                </li>
-              ))
-            )}
-          </ul>
-        </Card>
+                    <button
+                      onClick={() => setCoinId(id)}
+                      className="hover:underline uppercase truncate max-w-[12rem]"
+                      title="Show on chart"
+                    >
+                      {id}
+                    </button>
+                    <button
+                      onClick={() => toggleWatch(id)}
+                      className="text-red-500 hover:underline shrink-0"
+                      title="Remove"
+                    >
+                      Remove
+                    </button>
+                  </li>
+                ))
+              )}
+            </ul>
+          </Card>
+        </div>
       </section>
 
       {/* Markets table */}
-      <Card className="p-5 overflow-x-auto">
-        <SectionHeader title="Markets table">
-          Sort, star to watchlist, click a row to update the chart.
-        </SectionHeader>
+<Card className="p-5">
+  <SectionHeader title="Markets table">
+    Sort, star to watchlist, click a row to update the chart.
+  </SectionHeader>
 
-        <table className="w-full text-sm">
-          <thead className="bg-zinc-100 dark:bg-zinc-900">
-            <tr className="[&>th]:text-left [&>th]:px-4 [&>th]:py-2 [&>th]:font-semibold [&>th]:!text-white">
-              <th>Name</th><th>Price</th><th>24h</th><th>Market Cap</th><th>Volume</th><th>★</th>
+  <table className="w-full text-xs sm:text-sm">
+    <thead className="bg-zinc-100 dark:bg-zinc-900">
+      <tr className="[&>th]:px-2 [&>th]:py-2 [&>th]:font-semibold">
+        <th className="text-left w-[40%] sm:w-[24%]">Name</th>
+        <th className="text-right w-[20%] sm:w-[18%]">Price</th>
+        <th className="text-right w-[20%] sm:w-[12%]">24h</th>
+        {/* Hide wide columns on mobile; show on >= sm */}
+        <th className="hidden sm:table-cell text-right w-[23%]">Market Cap</th>
+        <th className="hidden sm:table-cell text-right w-[23%]">Volume</th>
+        <th className="text-center w-[8%] sm:w-[6%]">★</th>
+      </tr>
+    </thead>
+
+    <tbody className="[&>tr>td]:px-2">
+      {loadingMkts && (
+        <>
+          {[...Array(5)].map((_, i) => (
+            <tr key={`sk-${i}`}>
+              <td colSpan={6}>
+                <div className="h-8 shimmer my-2" />
+              </td>
             </tr>
-          </thead>
+          ))}
+        </>
+      )}
 
-          <tbody className="[&>tr>td]:px-4 [&>tr>td]:py-2">
-            {loadingMkts && (
-              <>
-                {[...Array(5)].map((_, i) => (
-                  <tr key={`sk-${i}`}>
-                    <td colSpan={6}>
-                      <div className="h-8 shimmer my-2" />
-                    </td>
-                  </tr>
-                ))}
-              </>
-            )}
+      {!loadingMkts &&
+        filtered.slice(0, 20).map((m, i) => {
+          const up = (m.price_change_percentage_24h ?? 0) >= 0;
+          return (
+            <React.Fragment key={m.id}>
+              {/* MAIN ROW */}
+              <tr
+                className={[
+                  "border-t dark:border-zinc-800 cursor-pointer transition-colors border-l-2",
+                  up
+                    ? "border-l-[hsl(var(--up))] hover:bg-[hsl(var(--up)/0.08)] dark:hover:bg-[hsl(var(--up)/0.12)]"
+                    : "border-l-[hsl(var(--down))] hover:bg-[hsl(var(--down)/0.08)] dark:hover:bg-[hsl(var(--down)/0.12)]",
+                ].join(" ")}
+                style={{ animationDelay: `${i * 50}ms` }}
+                onClick={() => { setCoinId(m.id); setSearch(''); }}
+              >
+                {/* Name */}
+                <td className="whitespace-normal sm:whitespace-nowrap break-words leading-snug">
+                  {m.name}{" "}
+                  <span className="text-[hsl(var(--text))]/60">
+                    ({m.symbol.toUpperCase()})
+                  </span>
+                </td>
 
-            {!loadingMkts && filtered.slice(0, 20).map((m, i) => {   // <-- i added here
-              const up = (m.price_change_percentage_24h ?? 0) >= 0;
-              return (
-                <tr
-                  key={m.id}
-                  className={[
-                    "border-t dark:border-zinc-800 cursor-pointer transition-colors border-l-2",
-                    up
-                      ? "border-l-[hsl(var(--up))] hover:bg-[hsl(var(--up)/0.08)] dark:hover:bg-[hsl(var(--up)/0.12)]"
-                      : "border-l-[hsl(var(--down))] hover:bg-[hsl(var(--down)/0.08)] dark:hover:bg-[hsl(var(--down)/0.12)]",
-                  ].join(" ")}
-                  style={{ animationDelay: `${i * 60}ms` }}         // <-- now valid
-                  onClick={() => { setCoinId(m.id); setSearch(''); }}
+                {/* Price */}
+                <td className="text-right whitespace-normal sm:whitespace-nowrap break-words leading-snug">
+                  {fmtCurrency(m.current_price, currency)}
+                </td>
+
+                {/* 24h */}
+                <td
+                  className="text-right font-semibold whitespace-normal sm:whitespace-nowrap leading-snug"
+                  style={{
+                    color:
+                      (m.price_change_percentage_24h ?? 0) > 0
+                        ? "hsl(var(--up))"
+                        : (m.price_change_percentage_24h ?? 0) < 0
+                        ? "hsl(var(--down))"
+                        : "hsl(var(--muted))",
+                  }}
                 >
-                  <td className="whitespace-nowrap">
-                    {m.name}{" "}
-                    <span className="text-[hsl(var(--text))]/60">
-                      ({m.symbol.toUpperCase()})
-                    </span>
-                  </td>
+                  {(m.price_change_percentage_24h ?? 0) > 0 ? "▲ " :
+                   (m.price_change_percentage_24h ?? 0) < 0 ? "▼ " : ""}
+                  {fmtPct(m.price_change_percentage_24h)}
+                </td>
 
-                  <td className="whitespace-nowrap">
-                    {fmtCurrency(m.current_price, currency)}
-                  </td>
+                {/* Market Cap (desktop only) */}
+                <td className="hidden sm:table-cell text-right whitespace-nowrap">
+                  {fmtCurrency(m.market_cap, currency)}
+                </td>
 
-                  {/* 24h number itself changes color */}
-                  <td
-                    className="font-semibold"
-                    style={{
-                      color:
-                        (m.price_change_percentage_24h ?? 0) > 0
-                          ? 'hsl(var(--up))'
-                          : (m.price_change_percentage_24h ?? 0) < 0
-                          ? 'hsl(var(--down))'
-                          : 'hsl(var(--muted))',
-                    }}
+                {/* Volume (desktop only) */}
+                <td className="hidden sm:table-cell text-right whitespace-nowrap">
+                  {fmtCurrency(m.total_volume, currency)}
+                </td>
+
+                {/* Star */}
+                <td className="text-center" onClick={(e) => e.stopPropagation()}>
+                  <button
+                    onClick={() => toggleWatch(m.id)}
+                    className="text-xl"
+                    style={{ color: isWatched(m.id) ? "#facc15" : "#9ca3af" }}
+                    aria-label={isWatched(m.id) ? "Remove from watchlist" : "Add to watchlist"}
+                    title={isWatched(m.id) ? "Remove from watchlist" : "Add to watchlist"}
                   >
-                    {(m.price_change_percentage_24h ?? 0) > 0 ? '▲ ' :
-                     (m.price_change_percentage_24h ?? 0) < 0 ? '▼ ' : ''}
-                    {fmtPct(m.price_change_percentage_24h)}
-                  </td>
+                    {isWatched(m.id) ? "★" : "☆"}
+                  </button>
+                </td>
+              </tr>
 
-                  <td className="whitespace-nowrap">{fmtCurrency(m.market_cap, currency)}</td>
-                  <td className="whitespace-nowrap">{fmtCurrency(m.total_volume, currency)}</td>
+              {/* MOBILE DETAIL ROW: shows Market Cap + Volume under the main row */}
+              <tr className="sm:hidden border-b dark:border-zinc-800">
+                <td colSpan={6} className="pt-1 pb-3">
+                  <div className="grid grid-cols-2 gap-2 text-[11px] leading-tight">
+                    <div className="opacity-70">Market Cap</div>
+                    <div className="text-right break-words">
+                      {fmtCurrency(m.market_cap, currency)}
+                    </div>
+                    <div className="opacity-70">Volume</div>
+                    <div className="text-right break-words">
+                      {fmtCurrency(m.total_volume, currency)}
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </React.Fragment>
+          );
+        })}
 
-                  {/* Watch star (doesn't trigger row click) */}
-                  <td onClick={(e) => e.stopPropagation()}>
-                    <button
-                      onClick={() => toggleWatch(m.id)}
-                      className="text-xl pressable"
-                      style={{ color: isWatched(m.id) ? '#facc15' : '#9ca3af' }}
-                      aria-label={isWatched(m.id) ? 'Remove from watchlist' : 'Add to watchlist'}
-                      title={isWatched(m.id) ? 'Remove from watchlist' : 'Add to watchlist'}
-                    >
-                      {isWatched(m.id) ? '★' : '☆'}
-                    </button>
-                  </td>
-                </tr>
-              );
-            })}
-
-            {!loadingMkts && filtered.length === 0 && (
-              <tr><td colSpan="6" className="py-6 text-center">No results</td></tr>
-            )}
-          </tbody>
-        </table>
-      </Card>
+      {!loadingMkts && filtered.length === 0 && (
+        <tr>
+          <td colSpan={6} className="py-6 text-center">No results</td>
+        </tr>
+      )}
+    </tbody>
+  </table>
+</Card>
     </main>
   );
 }
