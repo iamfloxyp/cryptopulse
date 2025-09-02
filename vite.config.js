@@ -5,11 +5,13 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      // anything beginning with /api-cg will be proxied to CoinGecko
+     
       '/api-cg': {
         target: 'https://api.coingecko.com/api/v3',
         changeOrigin: true,
+        secure: true,
         rewrite: (path) => path.replace(/^\/api-cg/, ''),
+        headers:{accept:"application/json"}
       },
     },
   },

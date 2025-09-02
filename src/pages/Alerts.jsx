@@ -4,7 +4,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../store/useAuth';
 import { useLocal } from '../store/useLocal';
 import { useAlerts } from '../store/useAlerts';
-import { getSpot } from '../services/price';
+import { getSpot } from '../services/coingecko';
 import Card from '../components/Card';
 import SectionHeader from '../components/SectionHeader';
 import Button from '../components/Button';
