@@ -1,18 +1,24 @@
 // src/services/coingecko.js
-const API = import.meta.env.VITE_API_BASE || "http://localhost:5000";
+const API = 'https://api.coingecko.com/api/v3';
 
-/** Top markets list for table & KPIs (backend proxy) */
-export async function getMarkets({ vsCurrency = "usd", perPage = 100, page = 1 }) {
-  const url = `${API}/api/markets?vs=${vsCurrency}&perPage=${perPage}&page=${page}`;
+async function http(url) {
   const res = await fetch(url);
-  if (!res.ok) throw new Error("Failed to load markets");
+  if (!res.ok) {
+    const text = await res.text().catch(() => '');
+    throw new Error(`Network ${res.status}: ${text || 'Failed to fetch'}`);
+  }
   return res.json();
 }
 
-/** Chart points for a coin (1 | 7 | 30 days) (backend proxy) */
-export async function getChart({ id, vsCurrency = "usd", days = 1 }) {
-  const url = `${API}/api/chart/${id}?vs=${vsCurrency}&days=${days}`;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error("Failed to load chart");
-  return res.json(); // { prices: [[timestamp, price], ...] }
+export async function getMarkets({ vsCurrency = 'usd', perPage = 100, page = 1 }) {
+  const url =
+    `${API}/coins/markets?vs_currency=${vsCurrency}` +
+    `&order=market_cap_desc&per_page=${perPage}&page=${page}` +
+    `&sparkline=false&price_change_percentage=24h`;
+  return http(url);
+}
+
+export async function getChart({ id, vsCurrency = 'usd', days = 1 }) {
+  const url = `${API}/coins/${id}/market_chart?vs_currency=${vsCurrency}&days=${days}`;
+  return http(url); 
 }

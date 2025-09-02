@@ -1,5 +1,5 @@
 
-// src/components/Button.jsx
+
 export default function Button({
   children,
   variant = "primary",
@@ -16,13 +16,13 @@ export default function Button({
     lg: "text-sm px-4 py-2.5",
   };
 
-  // src/components/Button.jsx
+  
 const variants = {
   primary: "brand-gradient text-white shadow-sm hover:opacity-95 focus:ring-indigo-400 dark:focus:ring-indigo-600",
   ghost:   "border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800",
   pill:    "bg-[hsl(var(--chip))] text-[hsl(var(--text))] hover:opacity-90 data-[active=true]:bg-[hsl(var(--accent))] data-[active=true]:text-white",
 
-  // NEW — subtle filled button that works in light & dark
+ 
   secondary: "bg-[hsl(var(--surface))] text-[hsl(var(--text))] border border-[hsl(var(--border))] hover:bg-[hsl(var(--chip))]"
 };
 

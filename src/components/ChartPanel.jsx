@@ -28,7 +28,7 @@ export default function ChartPanel({ coinId, days, currency, loader }) {
     return () => { alive = false; };
   }, [coinId, days, currency, loader]);
 
-  // choose color by performance (last vs first)
+  
   const lineColor = useMemo(() => {
     if (!series.length) return `hsl(${getCssVar('--text')})`;
     const first = series[0][1], last = series[series.length-1][1];

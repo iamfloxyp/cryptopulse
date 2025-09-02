@@ -1,8 +1,8 @@
-// src/store/useWatchlist.js
+
 import { useLocal } from './useLocal';
 
 export function useWatchlist() {
-  const [list, setList] = useLocal('watchlist', []); // ['bitcoin','ethereum',...]
+  const [list, setList] = useLocal('watchlist', []);
 
   const isWatched = (id) => list.includes(id);
 

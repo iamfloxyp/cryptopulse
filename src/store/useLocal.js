@@ -1,10 +1,7 @@
-// src/store/useLocal.js
+
 import { useEffect, useState } from "react";
 
-/**
- * useLocal — state that syncs to localStorage
- * Usage: const [val, setVal] = useLocal('key', initial)
- */
+
 export function useLocal(key, initialValue) {
   const read = () => {
     try {
@@ -15,14 +12,40 @@ export function useLocal(key, initialValue) {
     }
   };
 
-  // ✅ Correct: use function form so it runs once
-  const [value, setValue] = useState(() => read());
+  const [value, setValue] = useState(read);
 
+  
   useEffect(() => {
     try {
       localStorage.setItem(key, JSON.stringify(value));
+      
+      window.dispatchEvent(
+        new CustomEvent("local-update", { detail: { key, value } })
+      );
     } catch {}
   }, [key, value]);
+
+  
+  useEffect(() => {
+    const onStorage = (e) => {
+      if (e.key === key) {
+  
+        setValue(read());
+      }
+    };
+    const onLocalUpdate = (e) => {
+      if (e.detail?.key === key) {
+        setValue(e.detail.value);
+      }
+    };
+
+    window.addEventListener("storage", onStorage);
+    window.addEventListener("local-update", onLocalUpdate);
+    return () => {
+      window.removeEventListener("storage", onStorage);
+      window.removeEventListener("local-update", onLocalUpdate);
+    };
+  }, [key]);
 
   return [value, setValue];
 }

@@ -1,4 +1,4 @@
-// src/store/useAuth.js
+
 import { useLocal } from './useLocal';
 
 export function useAuth() {
@@ -6,7 +6,7 @@ export function useAuth() {
   const isAuthed = !!user;
 
   function login(payload) {
-    // payload: { phone, requestId? }
+    
     setUser(payload);
   }
 

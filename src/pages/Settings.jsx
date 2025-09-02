@@ -1,24 +1,31 @@
 // src/pages/Settings.jsx
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocal } from '../store/useLocal';
 import Card from '../components/Card';
 import SectionHeader from '../components/SectionHeader';
 import Button from '../components/Button';
 
 export default function Settings() {
-  // persisted settings
+  
   const [currency, setCurrency]         = useLocal('currency', 'usd');
-  const [theme, setTheme]               = useLocal('theme', 'dark');     // 'light' | 'dark'
+  const [theme, setTheme]               = useLocal('theme', 'dark');   
   const [defaultCoin, setDefaultCoin]   = useLocal('defaultCoin', 'bitcoin');
-  const [defaultRange, setDefaultRange] = useLocal('defaultRange', 7);   // 1 | 7 | 30
+  const [defaultRange, setDefaultRange] = useLocal('defaultRange', 7);   
   const [chartGrid, setChartGrid]       = useLocal('chartGrid', true);
   const [chartSmooth, setChartSmooth]   = useLocal('chartSmooth', true);
-  const [density, setDensity]           = useLocal('density', 'comfortable'); // 'comfortable' | 'compact'
+  const [density, setDensity]           = useLocal('density', 'comfortable'); 
 
-  // local notice
+
   const [msg, setMsg] = useState('');
 
-  // apply theme immediately to <html>
+ 
+  useEffect(() => {
+    const root = document.documentElement;
+    if (theme === 'dark') root.classList.add('dark');
+    else root.classList.remove('dark');
+  }, [theme]);
+
+  
   function applyTheme(next) {
     setTheme(next);
     const root = document.documentElement;
@@ -156,7 +163,11 @@ export default function Settings() {
         {/* Actions */}
         <div className="mt-8 flex items-center justify-between">
           <div className="text-sm text-muted h-5">{msg}</div>
-          <Button variant="secondary" className="rounded-full px-5 py-3 text-base" onClick={onReset}>
+          <Button
+            variant="secondary"
+            className="rounded-full px-5 py-3 text-base"
+            onClick={onReset}
+          >
             Reset app data
           </Button>
         </div>

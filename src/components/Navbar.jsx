@@ -1,4 +1,4 @@
-// src/components/Navbar.jsx
+
 import React, { useState } from "react";
 import { NavLink, Link, useLocation } from "react-router-dom";
 import Button from "./Button";
@@ -13,17 +13,16 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
 
   const linkBase =
-    "relative px-3 py-2 rounded-md text-sm font-medium text-[hsl(var(--text))]/80 hover:text-[hsl(var(--text))]";
-  const active =
-    "bg-[hsl(var(--surface))] text-[hsl(var(--text))] shadow-inner";
+    "relative px-3 py-2 rounded-md text-sm font-medium text-white hover:text-zinc-200";
+  const active = "bg-zinc-800 text-white shadow-inner";
 
-  // close menu after a nav click on mobile
+  
   const close = () => setOpen(false);
 
   return (
     <header
       className="sticky top-0 z-40 backdrop-blur
-                 bg-zinc-900/90 border-b border-[hsl(var(--border))]"
+                 bg-black border-b border-zinc-800"
     >
       <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-2">
         {/* Left: Brand */}
@@ -70,7 +69,13 @@ export default function Navbar() {
         {/* Right: auth action (desktop) */}
         <div className="hidden sm:flex items-center gap-2">
           {isAuthed ? (
-            <Button variant="ghost" onClick={logout}>Logout</Button>
+            <Button
+              size="lg"
+              className="bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 text-white font-semibold px-6 py-3 rounded-full shadow-lg hover:scale-105 transition-transform"
+              onClick={logout}
+            >
+              Logout
+            </Button>
           ) : (
             <NavLink to="/auth" state={{ from: location }}>
               <Button
@@ -85,19 +90,28 @@ export default function Navbar() {
 
         {/* Hamburger (mobile only) */}
         <button
-          className="sm:hidden inline-flex items-center justify-center p-2 rounded-md border border-[hsl(var(--border))] text-[hsl(var(--text))]/80"
+          className="sm:hidden inline-flex items-center justify-center p-2 rounded-md border border-zinc-700 text-white"
           aria-label="Open menu"
           aria-expanded={open}
           onClick={() => setOpen((v) => !v)}
         >
-          {/* Simple burger / close icon */}
           {!open ? (
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-              <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+              <path
+                d="M4 7h16M4 12h16M4 17h16"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
             </svg>
           ) : (
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-              <path d="M6 6l12 12M18 6l-12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+              <path
+                d="M6 6l12 12M18 6l-12 12"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
             </svg>
           )}
         </button>
@@ -145,13 +159,21 @@ export default function Navbar() {
 
             <div className="pt-2">
               {isAuthed ? (
-                <Button variant="ghost" className="w-full" onClick={() => { close(); logout(); }}>
+                <Button
+                  size="lg"
+                  className="bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 text-white font-semibold px-6 py-3 rounded-full shadow-lg hover:scale-105 transition-transform"
+                  onClick={() => {
+                    close();
+                    logout();
+                  }}
+                >
                   Logout
                 </Button>
               ) : (
                 <NavLink to="/auth" state={{ from: location }} onClick={close}>
                   <Button
-                    className="w-full bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 text-white font-semibold rounded-full shadow-lg"
+                    size="lg"
+                    className="bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 text-white font-semibold px-6 py-3 rounded-full shadow-lg hover:scale-105 transition-transform"
                   >
                     Login
                   </Button>

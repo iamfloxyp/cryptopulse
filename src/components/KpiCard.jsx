@@ -16,8 +16,8 @@ export default function KpiCard({
       onClick={onClick}
       className={[
         "glass w-full h-full text-left rounded-lg",
-        "p-5 md:p-6",                         // roomy padding
-        "transition hover:scale-[1.01]",      // subtle hover
+        "p-5 md:p-6",                         
+        "transition hover:scale-[1.01]",     
         active ? "kpi-active ring-1 ring-[hsl(var(--brand-from)/.25)]" : ""
       ].join(" ")}
     >
