@@ -38,7 +38,7 @@ export default function Alerts() {
     (async () => {
       try {
         const perPage = 250;   
-        const maxPages = 4;    
+        const maxPages = 2;    
         let all = [];
 
         for (let page = 1; page <= maxPages; page++) {

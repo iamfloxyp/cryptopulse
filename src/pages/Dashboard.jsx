@@ -150,7 +150,7 @@ export default function Dashboard() {
       try {
         setLoadingMkts(true);
         // fetch more rows by default
-        const data = await getMarkets({ vsCurrency: currency, perPage: 250, page: 1 });
+        const data = await getMarkets({ vsCurrency: currency, perPage: 150, page: 1 });
         if (!alive) return;
         setMarkets(data);
       } catch {
